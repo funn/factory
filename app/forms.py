@@ -11,3 +11,11 @@ class OrderDetailForm(forms.ModelForm):
         exclude = []
 
     customer = autocomplete_light.forms.ModelChoiceField(Customer.objects.all(), widget=autocomplete_light.ChoiceWidget('OrderDetailsAutocomplete'), label='Клиент')
+
+
+class MonthlyScheduleForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        days = kwargs.pop('days')
+        super(MonthlyScheduleForm, self).__init__(*args, **kwargs)
+        for day in range(1, days+1):
+            self.fields['day_{}'.format(day)] = forms.BooleanField(required=False)

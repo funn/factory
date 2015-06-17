@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %}
+{% load calendar_extras %}
+
+{% block content %}
+{% url 'admin:monthly_schedule' year=prev_date|date:"Y" month=prev_date|date:"n" as prev_url %}
+<a href="{{ prev_url }}">Предыдущий месяц</a>
+{% url 'admin:monthly_schedule' year=current_date|date:"Y" month=current_date|date:"n" as default_url %}
+<a href="{{ default_url }}">Текущий месяц</a>
+{% url 'admin:monthly_schedule' year=next_date|date:"Y" month=next_date|date:"n" as next_url %}
+<a href="{{ next_url }}">Следующий месяц</a>
+{% url 'admin:monthly_schedule' year=year month=month as this_url %}
+<form method="post" action="{{ this_url }}">
+{% csrf_token %}
+{{ formset.management_form }}
+<table>
+    <thead>
+        <tr>
+            <th>&nbsp;</th>
+            {% for day in days %}
+                <th>{{ day }}<br>{{ day|get_day_abbr:first_weekday }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for barber, form in barbers %}
+            <tr>
+                <th>{{ barber.name }}</th>
+                {% for field in form %}
+                    <td>{{ field }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<input type="submit" value="Сохранить">
+</form>
+{% endblock %}
