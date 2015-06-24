@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.forms.formsets import formset_factory
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
+from django.http import Http404
 
 from schedule.models.events import Event, EventRelation
 from schedule.periods import Day, Month
@@ -16,6 +17,9 @@ from .forms import MonthlyScheduleForm
 
 
 def monthly_schedule(request, year, month):
+    if  int(year) > 2037 or int(year) < 1970 or int(month) < 1 or int(month) > 12:
+        raise Http404
+
     MonthlyScheduleFormset = formset_factory(wraps(MonthlyScheduleForm)(partial(MonthlyScheduleForm, days=monthrange(int(year), int(month))[1])), extra=0)
 
     initial_data = []
