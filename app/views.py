@@ -14,7 +14,7 @@ from .forms import MonthlyScheduleForm
 
 
 def monthly_schedule(request, year, month):
-    MonthlyScheduleFormset = formset_factory(wraps(MonthlyScheduleForm)(partial(MonthlyScheduleForm, days=monthrange(int(year), int(month))[1])), extra=Barber.objects.count())
+    MonthlyScheduleFormset = formset_factory(wraps(MonthlyScheduleForm)(partial(MonthlyScheduleForm, days=monthrange(int(year), int(month))[1])), extra=0)
 
     initial_data = []
     for barber in Barber.objects.all():
