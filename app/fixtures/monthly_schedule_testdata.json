@@ -1,0 +1,374 @@
+[
+{
+    "model": "schedule.calendar",
+    "pk": 1,
+    "fields": {
+        "slug": "default",
+        "name": "default"
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 1,
+    "fields": {
+        "start": "2015-06-07T12:00:00Z",
+        "created_on": "2015-06-23T18:50:01.627Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-06-07T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:01.628Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 2,
+    "fields": {
+        "start": "2015-06-10T12:00:00Z",
+        "created_on": "2015-06-23T18:50:01.657Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-06-10T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:01.657Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 3,
+    "fields": {
+        "start": "2015-06-08T12:00:00Z",
+        "created_on": "2015-06-23T18:50:01.692Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-06-08T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:01.692Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 4,
+    "fields": {
+        "start": "2015-06-10T12:00:00Z",
+        "created_on": "2015-06-23T18:50:01.722Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-06-10T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:01.722Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 5,
+    "fields": {
+        "start": "2015-05-01T12:00:00Z",
+        "created_on": "2015-06-23T18:50:07.921Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-05-01T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:07.921Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 6,
+    "fields": {
+        "start": "2015-05-08T12:00:00Z",
+        "created_on": "2015-06-23T18:50:07.955Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-05-08T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:07.955Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 7,
+    "fields": {
+        "start": "2015-05-07T12:00:00Z",
+        "created_on": "2015-06-23T18:50:07.988Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-05-07T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:07.988Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 8,
+    "fields": {
+        "start": "2015-07-08T12:00:00Z",
+        "created_on": "2015-06-23T18:50:23.976Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-07-08T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:23.976Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 9,
+    "fields": {
+        "start": "2015-07-09T12:00:00Z",
+        "created_on": "2015-06-23T18:50:24.010Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-07-09T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:24.010Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 10,
+    "fields": {
+        "start": "2015-07-10T12:00:00Z",
+        "created_on": "2015-06-23T18:50:24.040Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-07-10T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:24.040Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 11,
+    "fields": {
+        "start": "2015-07-11T12:00:00Z",
+        "created_on": "2015-06-23T18:50:24.075Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-07-11T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:24.075Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 12,
+    "fields": {
+        "start": "2015-07-12T12:00:00Z",
+        "created_on": "2015-06-23T18:50:24.119Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-07-12T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:24.119Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 13,
+    "fields": {
+        "start": "2015-07-13T12:00:00Z",
+        "created_on": "2015-06-23T18:50:24.154Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-07-13T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:24.154Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.event",
+    "pk": 14,
+    "fields": {
+        "start": "2015-07-14T12:00:00Z",
+        "created_on": "2015-06-23T18:50:24.182Z",
+        "rule": null,
+        "title": "",
+        "description": null,
+        "calendar": 1,
+        "end": "2015-07-14T22:00:00Z",
+        "creator": null,
+        "updated_on": "2015-06-23T18:50:24.183Z",
+        "end_recurring_period": null
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 1,
+    "fields": {
+        "event": 1,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 2,
+    "fields": {
+        "event": 2,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 3,
+    "fields": {
+        "event": 3,
+        "object_id": 2,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 4,
+    "fields": {
+        "event": 4,
+        "object_id": 2,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 5,
+    "fields": {
+        "event": 5,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 6,
+    "fields": {
+        "event": 6,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 7,
+    "fields": {
+        "event": 7,
+        "object_id": 2,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 8,
+    "fields": {
+        "event": 8,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 9,
+    "fields": {
+        "event": 9,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 10,
+    "fields": {
+        "event": 10,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 11,
+    "fields": {
+        "event": 11,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 12,
+    "fields": {
+        "event": 12,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 13,
+    "fields": {
+        "event": 13,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+},
+{
+    "model": "schedule.eventrelation",
+    "pk": 14,
+    "fields": {
+        "event": 14,
+        "object_id": 1,
+        "distinction": null,
+        "content_type": 15
+    }
+}
+]

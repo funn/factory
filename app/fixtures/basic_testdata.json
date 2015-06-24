@@ -1,0 +1,110 @@
+[
+{
+    "model": "app.productcategory",
+    "fields": {
+        "name": "\u041a\u0440\u0430\u0441\u043a\u0430"
+    },
+    "pk": 1
+},
+{
+    "model": "app.productcategory",
+    "fields": {
+        "name": "\u0428\u0430\u043c\u043f\u0443\u043d\u044c\u043a\u0430"
+    },
+    "pk": 2
+},
+{
+    "model": "app.product",
+    "fields": {
+        "price": "500.00",
+        "product_category": 1,
+        "quantity": 2,
+        "name": "\u041a\u0440\u0430\u0441\u043d\u0430\u044f"
+    },
+    "pk": 1
+},
+{
+    "model": "app.product",
+    "fields": {
+        "price": "700.00",
+        "product_category": 1,
+        "quantity": 3,
+        "name": "\u0421\u0438\u043d\u044f\u044f"
+    },
+    "pk": 2
+},
+{
+    "model": "app.product",
+    "fields": {
+        "price": "137.50",
+        "product_category": 2,
+        "quantity": 0,
+        "name": "\u0411\u0435\u0437 \u0441\u043b\u0451\u0437"
+    },
+    "pk": 3
+},
+{
+    "model": "app.barber",
+    "fields": {
+        "description": "\u0411\u0440\u043e",
+        "photo": "./IMG-20140113-WA0001.jpg",
+        "name": "\u0421\u0442\u0435\u043f\u0430\u043d",
+        "phone": "+79612195898"
+    },
+    "pk": 1
+},
+{
+    "model": "app.barber",
+    "fields": {
+        "description": "\u041d\u0435 \u0431\u0440\u043e",
+        "photo": "./IMG-20140304-WA0001.jpg",
+        "name": "\u0410\u043d\u0430\u0442\u043e\u043b\u0438\u0439",
+        "phone": "+79612195899"
+    },
+    "pk": 2
+},
+{
+    "model": "app.customer",
+    "fields": {
+        "comment": "",
+        "name": "\u0412\u0430\u0441\u044f",
+        "phone": "+79612195896"
+    },
+    "pk": 1
+},
+{
+    "model": "app.customer",
+    "fields": {
+        "comment": "123",
+        "name": "\u0418\u043b\u044c\u044f",
+        "phone": "+79612195895"
+    },
+    "pk": 2
+},
+{
+    "model": "app.orderdetail",
+    "fields": {
+        "barber": 1,
+        "quantity": 1,
+        "customer": 1,
+        "product": 1,
+        "category": 1,
+        "date": "2015-06-23T18:46:36.495Z",
+        "cost": "500.00"
+    },
+    "pk": 1
+},
+{
+    "model": "app.orderdetail",
+    "fields": {
+        "barber": 2,
+        "quantity": 2,
+        "customer": 2,
+        "product": 3,
+        "category": 2,
+        "date": "2015-06-23T18:47:09.734Z",
+        "cost": "275.00"
+    },
+    "pk": 2
+}
+]
