@@ -112,3 +112,4 @@ target/
 
 db.sqlite3
 IMG*
+*.orig
