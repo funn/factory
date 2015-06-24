@@ -12,6 +12,7 @@ class ProductCategory(models.Model):
     def __str__(self):
         return self.name
 
+
 class Product(models.Model):
     name = models.CharField(verbose_name='Название товара', max_length=200)
     quantity = models.IntegerField(verbose_name='Количество')
@@ -21,7 +22,16 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-class Barber(models.Model):
+
+class PhoneValidationMixin(models.Model):
+    class Meta:
+        abstract = True
+
+    def clean(self):
+        self.phone = '+7{}'.format(self.phone[-10:])
+
+
+class Barber(PhoneValidationMixin):
     name = models.CharField(verbose_name='Имя', max_length=200)
     phone = models.CharField(max_length=12, validators=[phone_regex], verbose_name='Телефон')
     photo = models.ImageField(verbose_name='Фото', null=True)
@@ -30,13 +40,15 @@ class Barber(models.Model):
     def __str__(self):
         return self.name
 
-class Customer(models.Model):
+
+class Customer(PhoneValidationMixin):
     name = models.CharField(verbose_name='Имя', max_length=200)
     phone = models.CharField(max_length=12, validators=[phone_regex], verbose_name='Телефон')
     comment = models.TextField(verbose_name='Дополнительно', blank=True)
 
     def __str__(self):
         return "{}, {}".format(self.name, self.phone)
+
 
 class OrderDetail(models.Model):
     category = models.ForeignKey(ProductCategory, verbose_name='Категория')
