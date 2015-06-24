@@ -5,6 +5,8 @@ from functools import wraps, partial
 from django.template.response import TemplateResponse
 from django.contrib import admin
 from django.forms.formsets import formset_factory
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 
 from schedule.models.events import Event, EventRelation
 from schedule.periods import Day, Month
@@ -55,4 +57,7 @@ def monthly_schedule(request, year, month):
         current_date=datetime.datetime.now(),
         next_date=(datetime.date(int(year), int(month), monthrange(int(year), int(month))[1]) + datetime.timedelta(days=1)),
     )
-    return TemplateResponse(request, 'admin/monthly_schedule.html', context)
+    if request.method == 'POST':
+        return redirect(reverse('admin:monthly_schedule', kwargs={'year': year, 'month': month}), context)
+    else:
+        return TemplateResponse(request, 'admin/monthly_schedule.html', context)
