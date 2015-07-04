@@ -11,6 +11,7 @@ from django.utils.timezone import make_aware
 from django.conf import settings
 
 from schedule.models.events import Event, EventRelation
+from schedule.models.calendars import Calendar
 from schedule.periods import Day, Month
 
 from .models import Barber
@@ -26,7 +27,8 @@ def monthly_schedule(request, year, month):
     initial_data = []
     for barber in Barber.objects.all():
         data = {}
-        month_period = Month(EventRelation.objects.get_events_for_object(barber), datetime.datetime(int(year), int(month), 1))
+        calendar = Calendar.objects.get_or_create(name='barber_schedule')[0]
+        month_period = Month(calendar.events.get_for_object(barber), datetime.datetime(int(year), int(month), 1))
         for day_period in month_period.get_days():
             if day_period.has_occurrences():
                 data['day_{}'.format(day_period.start.day)] = True
@@ -38,17 +40,20 @@ def monthly_schedule(request, year, month):
             for form, barber in zip(formset, Barber.objects.all()):
                 for day in form.changed_data:
                     if not form.cleaned_data[day]:
-                        events = Event.objects.get_for_object(barber)
+                        calendar = Calendar.objects.get(name='barber_schedule')
+                        events = calendar.events.get_for_object(barber)
                         period = Day(events, datetime.datetime(int(year), int(month), int(day[4:])))
                         if period.has_occurrences():
                             for occurrence in period.get_occurrences():
                                 Event.objects.get(id=occurrence.event_id).delete()
                     else:
+                        calendar = Calendar.objects.get_or_create(name='barber_schedule')[0]
                         event = Event(
                             start=make_aware(datetime.datetime(int(year), int(month), int(day[4:]), settings.DAY_START)),
                             end=make_aware(datetime.datetime(int(year), int(month), int(day[4:]), settings.DAY_END))
                         )
                         event.save()
+                        calendar.events.add(event)
                         relation = EventRelation.objects.create_relation(event, barber)
                         relation.save()
 

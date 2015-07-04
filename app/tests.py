@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.utils.timezone import make_aware
 
 from schedule.models.events import Event
+from schedule.models.calendars import Calendar
 from schedule.periods import Month, Day
 
 from .forms import MonthlyScheduleForm
@@ -14,6 +15,9 @@ from .models import Customer, Barber
 
 class MonthlyScheduleViewTestCase(TestCase):
     fixtures = ['basic_testdata.json', 'admin.json', 'monthly_schedule_testdata.json']
+
+    def setUp(self):
+        self.calendar = Calendar.objects.get(name='barber_schedule')
 
     def test_index(self):
         index_url = reverse('admin:monthly_schedule', kwargs={'year': datetime.datetime.now().year, 'month': datetime.datetime.now().month})
@@ -48,7 +52,7 @@ class MonthlyScheduleViewTestCase(TestCase):
         formset = resp.context['formset']
         self.assertEqual(len(formset), Barber.objects.all().count())
         for form, barber in zip(formset, Barber.objects.all()):
-            month = Month(Event.objects.get_for_object(barber), date=date)
+            month = Month(self.calendar.events.get_for_object(barber), date=date)
             self.assertEqual(len(form.visible_fields()), len(list(month.get_days())))
             self.assertEqual(len(form.changed_data), len(month.get_occurrences()))
             for day, occ in zip(form.changed_data, month.cached_get_sorted_occurrences()):
@@ -74,7 +78,7 @@ class MonthlyScheduleViewTestCase(TestCase):
         )
         self.assertEqual(resp.status_code, 302)
         for barber in Barber.objects.all():
-            self.assertTrue(Day(Event.objects.get_for_object(barber), date=datetime.date(date.year, date.month, date.day)).has_occurrences())
+            self.assertTrue(Day(self.calendar.events.get_for_object(barber), date=datetime.date(date.year, date.month, date.day)).has_occurrences())
 
     def test_delete_events(self):
         self.client.login(username='admin', password='pa55w0rd')
@@ -97,7 +101,7 @@ class MonthlyScheduleViewTestCase(TestCase):
         )
         self.assertEqual(resp.status_code, 302)
         for barber in Barber.objects.all():
-            self.assertFalse(Day(Event.objects.get_for_object(barber), date=datetime.date(date.year, date.month, date.day)).has_occurrences())
+            self.assertFalse(Day(self.calendar.events.get_for_object(barber), date=datetime.date(date.year, date.month, date.day)).has_occurrences())
 
     def test_add_and_delete_events(self):
         self.client.login(username='admin', password='pa55w0rd')
@@ -122,8 +126,8 @@ class MonthlyScheduleViewTestCase(TestCase):
         )
         self.assertEqual(resp.status_code, 302)
         for barber in Barber.objects.all():
-            self.assertFalse(Day(Event.objects.get_for_object(barber), date=datetime.date(date.year, date.month, date.day)).has_occurrences())
-            self.assertTrue(Day(Event.objects.get_for_object(barber), date=datetime.date(date.year, date.month, 23)).has_occurrences())
+            self.assertFalse(Day(self.calendar.events.get_for_object(barber), date=datetime.date(date.year, date.month, date.day)).has_occurrences())
+            self.assertTrue(Day(self.calendar.events.get_for_object(barber), date=datetime.date(date.year, date.month, 23)).has_occurrences())
 
 
 class CustomerTestCase(TestCase):
