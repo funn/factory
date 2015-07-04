@@ -3,6 +3,7 @@ import datetime
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from django.utils.timezone import make_aware
 
 from schedule.models.events import Event
 from schedule.periods import Month, Day
@@ -42,7 +43,7 @@ class MonthlyScheduleViewTestCase(TestCase):
 
     def test_get_values(self):
         self.client.login(username='admin', password='pa55w0rd')
-        date = datetime.date(2015, 6, 1)
+        date = datetime.datetime(2015, 6, 1)
         resp = self.client.get(reverse('admin:monthly_schedule', kwargs={'year': date.year, 'month': date.month}))
         formset = resp.context['formset']
         self.assertEqual(len(formset), Barber.objects.all().count())
@@ -55,7 +56,7 @@ class MonthlyScheduleViewTestCase(TestCase):
 
     def test_add_events(self):
         self.client.login(username='admin', password='pa55w0rd')
-        date = datetime.date(2015, 6, 22)
+        date = make_aware(datetime.datetime(2015, 6, 22))
         resp = self.client.get(reverse('admin:monthly_schedule', kwargs={'year': date.year, 'month': date.month}))
         data = {
             'form-TOTAL_FORMS': 2,
@@ -77,7 +78,7 @@ class MonthlyScheduleViewTestCase(TestCase):
 
     def test_delete_events(self):
         self.client.login(username='admin', password='pa55w0rd')
-        date = datetime.date(2015, 6, 10)
+        date = make_aware(datetime.datetime(2015, 6, 10))
         resp = self.client.get(reverse('admin:monthly_schedule', kwargs={'year': date.year, 'month': date.month}))
         data = {
             'form-TOTAL_FORMS': 2,
@@ -100,7 +101,7 @@ class MonthlyScheduleViewTestCase(TestCase):
 
     def test_add_and_delete_events(self):
         self.client.login(username='admin', password='pa55w0rd')
-        date = datetime.date(2015, 6, 10)
+        date = make_aware(datetime.datetime(2015, 6, 10))
         resp = self.client.get(reverse('admin:monthly_schedule', kwargs={'year': date.year, 'month': date.month}))
         data = {
             'form-TOTAL_FORMS': 2,
