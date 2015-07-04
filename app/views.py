@@ -2,10 +2,9 @@ from calendar import monthrange
 import datetime
 from functools import wraps, partial
 
-from django.template.response import TemplateResponse
 from django.contrib import admin
 from django.forms.formsets import formset_factory
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.utils.timezone import make_aware
@@ -69,7 +68,7 @@ def monthly_schedule(request, year, month):
     if request.method == 'POST':
         return redirect(reverse('admin:monthly_schedule', kwargs={'year': year, 'month': month}), context)
     else:
-        return TemplateResponse(request, 'admin/monthly_schedule.html', context)
+        return render(request, 'admin/monthly_schedule.html', context)
 
 def daily_schedule(request, year, month, day):
     context = dict(
