@@ -65,3 +65,9 @@ def monthly_schedule(request, year, month):
         return redirect(reverse('admin:monthly_schedule', kwargs={'year': year, 'month': month}), context)
     else:
         return TemplateResponse(request, 'admin/monthly_schedule.html', context)
+
+def daily_schedule(request, year, month, day):
+    context = dict(
+        admin.site.each_context(request),
+    )
+    return TemplateResponse(request, 'admin/daily_schedule.html', context)
