@@ -9,6 +9,7 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.utils.timezone import make_aware
+from django.conf import settings
 
 from schedule.models.events import Event, EventRelation
 from schedule.periods import Day, Month
@@ -18,7 +19,7 @@ from .forms import MonthlyScheduleForm
 
 
 def monthly_schedule(request, year, month):
-    if  int(year) > 2037 or int(year) < 1970 or int(month) < 1 or int(month) > 12:
+    if int(year) > 2037 or int(year) < 1970 or int(month) < 1 or int(month) > 12:
         raise Http404
 
     MonthlyScheduleFormset = formset_factory(wraps(MonthlyScheduleForm)(partial(MonthlyScheduleForm, days=monthrange(int(year), int(month))[1])), extra=0)
@@ -45,8 +46,8 @@ def monthly_schedule(request, year, month):
                                 Event.objects.get(id=occurrence.event_id).delete()
                     else:
                         event = Event(
-                            start=make_aware(datetime.datetime(int(year), int(month), int(day[4:]), 12)),
-                            end=make_aware(datetime.datetime(int(year), int(month), int(day[4:]), 12)+datetime.timedelta(hours=10))
+                            start=make_aware(datetime.datetime(int(year), int(month), int(day[4:]), settings.DAY_START)),
+                            end=make_aware(datetime.datetime(int(year), int(month), int(day[4:]), settings.DAY_END))
                         )
                         event.save()
                         relation = EventRelation.objects.create_relation(event, barber)
