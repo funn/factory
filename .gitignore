@@ -113,3 +113,13 @@ target/
 db.sqlite3
 IMG*
 *.orig
+
+### Yeoman template
+node_modules/
+bower_components/
+*.log
+
+build/
+dist/
+
+
