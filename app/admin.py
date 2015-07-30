@@ -4,7 +4,7 @@ from django.contrib import admin
 
 from .models import *
 from .forms import OrderDetailForm
-from .views import monthly_schedule, daily_schedule
+from .views import monthly_schedule, daily_schedule, create_appointment
 
 
 @admin.register(Customer, site=admin.site)
@@ -31,6 +31,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(OrderDetail, site=admin.site)
 class OrderDetailAdmin(admin.ModelAdmin):
+    exclude = ('appointment',)
     date_hierarchy = 'date'
     list_display = ('customer', 'category', 'product', 'quantity', 'cost', 'date', 'barber')
     form = OrderDetailForm
@@ -39,3 +40,4 @@ class OrderDetailAdmin(admin.ModelAdmin):
 admin.site.register(Barber)
 admin.site.register_view('monthly_schedule/(?P<year>[0-9]{4})/(?P<month>[0-9]{1,2})/', 'Расписание на месяц', view=monthly_schedule, default_view='monthly_schedule/{}/{}/'.format(datetime.now().year, datetime.now().month), urlname='monthly_schedule')
 admin.site.register_view('daily_schedule/(?P<year>[0-9]{4})/(?P<month>[0-9]{1,2})/(?P<day>[0-9]{1,2})/', 'Расписание на день', view=daily_schedule, default_view='daily_schedule/{}/{}/{}'.format(datetime.now().year, datetime.now().month, datetime.now().day), urlname='daily_schedule')
+admin.site.register_view('create_appointment/(?P<barber>[0-9]{1,2})/', view=create_appointment, visible=False, urlname='create_appointment')
