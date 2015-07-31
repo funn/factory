@@ -12,8 +12,10 @@ from smart_selects.db_fields import ChainedForeignKey
 
 phone_regex = RegexValidator(regex=r'^(\+7|8)?\d{10}$', message="Некорректный номер телефона, ожидаемый ввод +79614567890 или 89614567890 или 9614567890")
 
+
 class ProductCategory(models.Model):
     name = models.CharField(verbose_name='Название категории', max_length=200)
+    service = models.BooleanField(verbose_name='Услуга')
 
     def __str__(self):
         return self.name
@@ -88,6 +90,7 @@ class Customer(PhoneValidationMixin):
 class Appointment(models.Model):
     customer = models.ForeignKey(Customer, verbose_name='Клиент')
     barber = models.ForeignKey(Barber, verbose_name='Парикмахер')
+    service = models.ForeignKey(Product, verbose_name='Услуга')
     comment = models.TextField(verbose_name='Дополнительно', blank=True)
 
 

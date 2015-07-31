@@ -130,8 +130,9 @@ def create_appointment(request, barber):
             duration = form.cleaned_data['duration']
             customer = form.cleaned_data['customer']
             comment = form.cleaned_data['comment']
+            service = form.cleaned_data['service']
             if barber.is_available(date, duration):
-                appointment = Appointment(customer=customer, barber=barber, comment=comment)
+                appointment = Appointment(customer=customer, barber=barber, comment=comment, service=service)
                 appointment.save()
                 event = Event(start=date, end=date+timedelta(hours=int(duration)))
                 event.save()
