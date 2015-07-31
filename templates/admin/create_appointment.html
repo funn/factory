@@ -1,4 +1,7 @@
-<div class="modal-dialog modal-lg">
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+<div class="modal-dialog modal-md">
     <div class="modal-content">
         <form id="appointmentForm" method='post' class="form" role="form" action='{% url 'admin:create_appointment' barber.id %}'>
             <div class="modal-header">
@@ -6,33 +9,13 @@
                 <h4 class="modal-title" id="myModalLabel">{{ barber.name }}&nbsp;<span id="appointmentTime"></span></h4>
             </div>
             <div class="modal-body">
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                <div class="form-group">
-                    {% for field in form %}
-                        <div class="form-group">
-                            {% if field.errors %}
-                                <ul class="form-errors">
-                                    {% for error in field.errors %}
-                                        <li><span class="fa fa-exclamation-triangle"></span> <strong>{{ error|escape }}</strong></li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
-                            {{ field.label_tag }}
-                            {{ field }}
-                            {% if field.help_text %}
-                                <div class="form-helptext">
-                                    {{ field.help_text }}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
+                {{ form|crispy }}
                 <div class="modal-footer">
-                    <input type="button" class="btn btn-default" data-dismiss="modal" value="clear" />
-                    <input type="submit" class="btn btn-primary" value="save" style="margin-bottom: 5px;" />
+                    <input type="submit" class="btn btn-primary" value="Сохранить" style="margin-bottom: 5px;" />
                 </div>
             </div>
         </form>
+        <script src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
+        <script src="{% static 'autocomplete_light/addanother.js' %}"></script>
     </div>
 </div>
