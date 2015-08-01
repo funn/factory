@@ -1,0 +1,19 @@
+td a span {
+    font-size: 22px;
+}
+
+#main_table tbody td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+tr th {
+    font-size: 18px;
+    text-align: center;
+}
+
+tr th:first-child {
+    width: 75px;
+    font-size: 18px;
+    text-align: center;
+}

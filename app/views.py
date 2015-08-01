@@ -16,7 +16,7 @@ from schedule.models.events import Event, EventRelation
 from schedule.models.calendars import Calendar
 from schedule.periods import Day, Month
 
-from .models import Barber, Appointment
+from .models import Barber, Appointment, Customer
 from .forms import MonthlyScheduleForm, CreateAppointmentForm
 
 
@@ -92,13 +92,14 @@ def daily_schedule(request, year, month, day):
             event = EventRelation.objects.filter(event__calendar__name='client_schedule').filter(object_id=app_id['id']).values('event_id')
             events_list.append(Event.objects.get(pk=event[0]['event_id'])) # Fucking horrible.
         events[barber] = Day(events_list, datetime(int(year), int(month), int(day))).occurrences
+        events[barber] = list(zip(events[barber], [Appointment.objects.get(pk=EventRelation.objects.filter(event__calendar__name='client_schedule').get(event__id=occ.event_id).object_id) for occ in events[barber]]))
 
     table_nodes = {}
     for barber in active_barbers:
         if not table_nodes.get(barber):
             table_nodes[barber] = []
 
-        busy_hours = {occ.start.astimezone(timezone(settings.TIME_ZONE)).hour: occ.end.astimezone(timezone(settings.TIME_ZONE)).hour-occ.start.astimezone(timezone(settings.TIME_ZONE)).hour for occ in events[barber]}
+        busy_hours = {occ_tuple[0].start.astimezone(timezone(settings.TIME_ZONE)).hour: occ_tuple[0].end.astimezone(timezone(settings.TIME_ZONE)).hour-occ_tuple[0].start.astimezone(timezone(settings.TIME_ZONE)).hour for occ_tuple in events[barber]}
         hour_skip = 0
         for hour in range(settings.DAY_START, settings.DAY_END):
             if hour in busy_hours.keys():

@@ -22,11 +22,11 @@ $(function () {
                     },
                     success: function () { // Have to show errors here.
                         alert('success');
-                        //setTimeout(function () { window.location.reload(); }, 1000);
+                        window.location.reload();
                     },
                     error: function () {
                         alert('failure');
-                        //setTimeout(function () { window.location.reload(); }, 1000);
+                        window.location.reload();
                     }
                 };
                 $('#appointmentForm').ajaxForm(form_options);

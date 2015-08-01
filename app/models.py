@@ -68,7 +68,7 @@ class Barber(PhoneValidationMixin):
         if not Day(barber_schedule_data, date).has_occurrences():
             return False # Barber doesn't work this day.
 
-        client_schedule_data = [Event.objects.get(pk=item['event_id']) for item in EventRelation.objects.filter(event__calendar__name='client_schedule').filter(object_id=self.id).values('event').values()]
+        client_schedule_data = [Event.objects.get(pk=EventRelation.objects.filter(event__calendar__name='client_schedule').get(object_id=appointment.id).event_id) for appointment in Appointment.objects.filter(barber=self)]
         if Period(client_schedule_data, date + timedelta(minutes=1), date + timedelta(hours=int(duration)-1, minutes=59)).has_occurrences():
             return False # Barber got another client at this time.
 
