@@ -40,4 +40,3 @@ class OrderAppointmentForm(forms.Form):
     product = forms.ModelChoiceField(Product.objects.all())
     quantity = forms.IntegerField()
     cost = forms.DecimalField()
-

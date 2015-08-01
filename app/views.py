@@ -1,7 +1,6 @@
 from calendar import monthrange
 from datetime import datetime, timedelta
 from functools import wraps, partial
-from json import dumps as json_dumps
 from pytz import timezone
 
 from django.contrib import admin
@@ -16,7 +15,7 @@ from schedule.models.events import Event, EventRelation
 from schedule.models.calendars import Calendar
 from schedule.periods import Day, Month
 
-from .models import Barber, Appointment, Customer
+from .models import Barber, Appointment
 from .forms import MonthlyScheduleForm, CreateAppointmentForm
 
 
@@ -129,11 +128,8 @@ def create_appointment(request, barber):
         if form.is_valid():
             date = make_aware(datetime.strptime(request.POST['date'], '%a, %d %b %Y %H:%M:%S %Z'), utc).astimezone(timezone(settings.TIME_ZONE))
             duration = form.cleaned_data['duration']
-            customer = form.cleaned_data['customer']
-            comment = form.cleaned_data['comment']
-            service = form.cleaned_data['service']
             if barber.is_available(date, duration):
-                appointment = Appointment(customer=customer, barber=barber, comment=comment, service=service)
+                appointment = Appointment(customer=form.cleaned_data['customer'], barber=barber, comment=form.cleaned_data['comment'], service=form.cleaned_data['service'])
                 appointment.save()
                 event = Event(start=date, end=date+timedelta(hours=int(duration)))
                 event.save()
