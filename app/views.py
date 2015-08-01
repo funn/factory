@@ -15,7 +15,7 @@ from schedule.models.events import Event, EventRelation
 from schedule.models.calendars import Calendar
 from schedule.periods import Day, Month
 
-from .models import Barber, Appointment
+from .models import Barber, Appointment, ProductCategory, Product
 from .forms import MonthlyScheduleForm, CreateAppointmentForm
 
 
@@ -129,8 +129,11 @@ def create_appointment(request, barber):
             date = make_aware(datetime.strptime(request.POST['date'], '%a, %d %b %Y %H:%M:%S %Z'), utc).astimezone(timezone(settings.TIME_ZONE))
             duration = form.cleaned_data['duration']
             if barber.is_available(date, duration):
-                appointment = Appointment(customer=form.cleaned_data['customer'], barber=barber, comment=form.cleaned_data['comment'], service=form.cleaned_data['service'])
+                appointment = Appointment(customer=form.cleaned_data['customer'], barber=barber, comment=form.cleaned_data['comment'])
                 appointment.save()
+                for category in ProductCategory.objects.filter(service=True):
+                    if form.cleaned_data['show_{}'.format(category.id)]:
+                        appointment.services.add(form.cleaned_data['service_{}'.format(category.id)])
                 event = Event(start=date, end=date+timedelta(hours=int(duration)))
                 event.save()
                 calendar = Calendar.objects.get(name='client_schedule')

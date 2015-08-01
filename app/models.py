@@ -90,7 +90,7 @@ class Customer(PhoneValidationMixin):
 class Appointment(models.Model):
     customer = models.ForeignKey(Customer, verbose_name='Клиент')
     barber = models.ForeignKey(Barber, verbose_name='Парикмахер')
-    service = models.ForeignKey(Product, verbose_name='Услуга')
+    services = models.ManyToManyField(Product)
     comment = models.TextField(verbose_name='Дополнительно', blank=True)
 
 

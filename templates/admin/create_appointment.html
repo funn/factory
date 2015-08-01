@@ -17,5 +17,11 @@
         </form>
         <script src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
         <script src="{% static 'autocomplete_light/addanother.js' %}"></script>
+        <script>
+            $("[id^=id_service_]").prop("disabled", true);
+            $("[id^=id_show_]").click(function (event) {
+                $("#id_service_"+this.id.slice(-1)).prop("disabled", !this.checked);
+            });
+        </script>
     </div>
 </div>
