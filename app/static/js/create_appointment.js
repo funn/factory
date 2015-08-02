@@ -21,13 +21,8 @@ $(function () {
                         date: date.toUTCString()
                     },
                     success: function () { // Have to show errors here.
-                        alert('success');
-                        window.location.reload();
+                        setTimeout(function () {window.location.reload();}, 2000);
                     },
-                    error: function () {
-                        alert('failure');
-                        window.location.reload();
-                    }
                 };
                 $('#appointmentForm').ajaxForm(form_options);
                 modal.modal('show');

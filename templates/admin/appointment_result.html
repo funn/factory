@@ -1,0 +1,17 @@
+{% load staticfiles %}
+
+<div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h4 class="modal-title" id="myModalLabel">{% if status == 400 %}Беда{% else %}Успех{% endif %}</h4>
+        </div>
+        <div class="modal-body">
+            {% if status == 400 %}
+                <p>Что-то пошло не так, запись не создана.</p>
+            {% else %}
+                <p>Запись успешно сзодана!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

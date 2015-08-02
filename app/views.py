@@ -142,7 +142,7 @@ def create_appointment(request, barber):
                 relation.save()
                 status = 201
 
-        return HttpResponse(status=status)
+        return render(request, 'admin/appointment_result.html', {'status': status})
 
     form = CreateAppointmentForm()
     context = dict(
