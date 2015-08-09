@@ -16,7 +16,7 @@ from schedule.models.calendars import Calendar
 from schedule.periods import Day, Month
 
 from .models import Barber, Appointment, ProductCategory, Product
-from .forms import MonthlyScheduleForm, CreateAppointmentForm
+from .forms import MonthlyScheduleForm, CreateAppointmentForm, OrderAppointmentForm
 
 
 def monthly_schedule(request, year, month):
@@ -151,3 +151,12 @@ def create_appointment(request, barber):
         form=form,
     )
     return render(request, 'admin/create_appointment.html', context)
+
+
+def edit_appointment(request, appointment):
+    appointment = get_object_or_404(Appointment, pk=appointment)
+    EditAppointmentFormset = formset_factory(OrderAppointmentForm, can_delete=True)
+
+    formset = EditAppointmentFormset()
+
+    return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset})

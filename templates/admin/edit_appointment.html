@@ -1,10 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+{% load calendar_extras %}
 
-</body>
-</html>
+<div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <form id="appointmentForm" method='post' class="form" role="form" action='{% url 'admin:edit_appointment' appointment.id %}'>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">{{ appointment.barber.name }}&nbsp;<span id="appointmentTime"></span></h4>
+            </div>
+            <div class="modal-body">
+                <div id="formset" data-formset-prefix="{{ formset.prefix }}">
+                    {{ formset.management_form }}
+
+                    <div data-formset-body>
+                        <!-- New forms will be inserted in here -->
+                        {% for form in formset %}
+                            <div data-formset-form>
+                                {{ form|crispy }}
+                                <button type="button" data-formset-delete-button>Delete form</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- The empty form template. By wrapping this in a <script> tag, the
+                    __prefix__ placeholder can easily be replaced in both attributes and
+                    any scripts -->
+                    <script type="form-template" data-formset-empty-form>
+                        {% escapescript %}
+                            <div data-formset-form>
+                                {{ formset.empty_form|crispy }}
+                                <button type="button" data-formset-delete-button>Delete form</button>
+                            </div>
+                        {% endescapescript %}
+                    </script>
+
+                    <!-- This button will add a new form when clicked -->
+                    <input type="button" value="Add another" data-formset-add>
+
+                    <script>jQuery(function($) {
+                        $("#formset").formset({
+                            animateForms: true
+                        });
+                    });</script>
+
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-primary" value="Сохранить" style="margin-bottom: 5px;" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

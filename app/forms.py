@@ -3,6 +3,8 @@ from django.conf import settings
 
 import autocomplete_light
 
+from smart_selects.form_fields import ChainedModelChoiceField
+
 from .models import OrderDetail, Customer, ProductCategory, Product
 
 
@@ -48,7 +50,7 @@ class CreateAppointmentForm(forms.Form):
 
 
 class OrderAppointmentForm(forms.Form):
-    category = forms.ModelChoiceField(ProductCategory.objects.all())
-    product = forms.ModelChoiceField(Product.objects.all())
+    category = forms.ModelChoiceField(ProductCategory.objects.all(), label='Категория')
+    product = ChainedModelChoiceField('app', 'Product', 'category', 'product_category', show_all=False, auto_choose=True, label='Товар')
     quantity = forms.IntegerField()
     cost = forms.DecimalField()

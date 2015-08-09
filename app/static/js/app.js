@@ -1,6 +1,7 @@
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
 require('jquery-form');
+require('./jquery.formset.js');
 require('bootstrap');
 
 $(function () {
