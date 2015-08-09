@@ -28,6 +28,10 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'product_category', 'price', 'quantity')
     list_filter = ('product_category',)
 
+    formfield_overrides = {
+        models.DecimalField: {'min_value': 0},
+    }
+
 
 @admin.register(OrderDetail, site=admin.site)
 class OrderDetailAdmin(admin.ModelAdmin):
@@ -35,6 +39,10 @@ class OrderDetailAdmin(admin.ModelAdmin):
     date_hierarchy = 'date'
     list_display = ('customer', 'category', 'product', 'quantity', 'cost', 'date', 'barber')
     form = OrderDetailForm
+
+    formfield_overrides = {
+        models.DecimalField: {'min_value': 0},
+    }
 
 
 admin.site.register(Barber)

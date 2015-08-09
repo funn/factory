@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.db import models
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator
 from django.conf import settings
 
 from schedule.models.events import Event, EventRelation
@@ -23,8 +23,8 @@ class ProductCategory(models.Model):
 
 class Product(models.Model):
     name = models.CharField(verbose_name='Название товара', max_length=200)
-    quantity = models.IntegerField(verbose_name='Количество')
-    price = models.DecimalField(verbose_name='Цена', max_digits=8, decimal_places=2)
+    quantity = models.PositiveIntegerField(verbose_name='Количество', validators=[MinValueValidator(1)], default=1)
+    price = models.DecimalField(verbose_name='Цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
     product_category = models.ForeignKey(ProductCategory, verbose_name='Категория')
 
     def __str__(self):
@@ -97,8 +97,8 @@ class Appointment(models.Model):
 class OrderDetail(models.Model):
     category = models.ForeignKey(ProductCategory, verbose_name='Категория')
     product = ChainedForeignKey(Product, chained_field='category', chained_model_field='product_category', show_all=False, auto_choose=True, verbose_name='Товар')
-    quantity = models.IntegerField(verbose_name='Количество')
-    cost = models.DecimalField(verbose_name='Цена', max_digits=8, decimal_places=2)
+    quantity = models.PositiveIntegerField(verbose_name='Количество', validators=[MinValueValidator(1)], default=1)
+    cost = models.DecimalField(verbose_name='Цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
     date = models.DateTimeField(verbose_name='Время', auto_now_add=True)
     barber = models.ForeignKey(Barber, verbose_name='Парикмахер')
     customer = models.ForeignKey(Customer, verbose_name='Клиент')
