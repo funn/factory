@@ -1,0 +1,45 @@
+{
+  "name": "factory",
+  "version": "1.0.0",
+  "description": "Barber shop app",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "funn@siberian.ninja:factory.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^3.3.5",
+    "jquery": "^2.1.4",
+    "jquery-form": "^3.50.0"
+  },
+  "browser": {
+    "jquery-form": "./node_modules/jquery-form/jquery.form.js"
+  },
+  "devDependencies": {
+    "autoprefixer-core": "^5.2.1",
+    "browser-sync": "^2.8.2",
+    "browserify": "^11.0.1",
+    "del": "^1.2.0",
+    "gulp": "^3.9.0",
+    "gulp-if": "^1.2.5",
+    "gulp-imagemin": "^2.3.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-mocha": "^2.1.3",
+    "gulp-notify": "^2.2.0",
+    "gulp-postcss": "^5.1.10",
+    "gulp-sass": "^2.0.4",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.2.0",
+    "gulp-util": "^3.0.6",
+    "jshint-stylish": "^2.0.1",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.3.1",
+    "yargs": "^3.18.0"
+  }
+}

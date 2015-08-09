@@ -1,4 +1,4 @@
-{% extends "admin/base_site.html" %}
+{% extends "admin/base.html" %}
 {% load calendar_extras %}
 {% load staticfiles %}
 
@@ -9,9 +9,8 @@
 
 {% block extrahead %}
     {{ block.super }}
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/jquery.form.js' %}"></script>
-    <script src="{% static 'js/create_appointment.js' %}"></script>
+    <script src="{% static 'js/build.js' %}"></script>
+    {% include 'autocomplete_light/static.html' %}
 {% endblock %}
 
 {% block content %}

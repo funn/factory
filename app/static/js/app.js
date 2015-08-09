@@ -1,3 +1,8 @@
+global.jQuery = require('jquery');
+global.$ = global.jQuery;
+require('jquery-form');
+require('bootstrap');
+
 $(function () {
     $('#main_table a').click(function (event) { // Maybe not so general?
         event.preventDefault();
