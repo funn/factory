@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.forms.formsets import formset_factory
 from django.shortcuts import redirect, render, get_object_or_404
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponse
+from django.http import Http404, JsonResponse
 from django.utils.timezone import make_aware, utc
 from django.conf import settings
 
@@ -160,3 +160,8 @@ def edit_appointment(request, appointment):
     formset = EditAppointmentFormset()
 
     return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset})
+
+
+def get_product_price(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    return JsonResponse(dict(price=product.price))
