@@ -158,8 +158,9 @@ def edit_appointment(request, appointment):
     EditAppointmentFormset = formset_factory(OrderAppointmentForm, can_delete=True)
 
     formset = EditAppointmentFormset()
+    form = CreateAppointmentForm()
 
-    return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset})
+    return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset, 'barber': appointment.barber, 'form': form})
 
 
 def get_product_price(request, product_id):

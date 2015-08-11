@@ -1,0 +1,36 @@
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+<form id="appointmentForm" method='post' class="form" role="form" action='{% url 'admin:create_appointment' barber.id %}'>
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title" id="myModalLabel">{{ barber.name }}&nbsp;<span id="appointmentTime"></span></h4>
+    </div>
+    <div class="modal-body">
+        {{ form|crispy }}
+        <div class="modal-footer">
+            <input type="submit" class="btn btn-primary" value="Сохранить"/>
+        </div>
+    </div>
+</form>
+<script>
+    $.getScript("{% static 'admin/js/admin/RelatedObjectLookups.js' %}");
+    $.getScript("{% static 'autocomplete_light/addanother.js' %}");
+    $("[id^=id_service_]").prop("disabled", true);
+    $("[id^=id_cost_]").prop("disabled", true);
+    $("[id^=id_show_]").click(function (event) {
+        $("#id_service_"+this.id.slice(-1)).prop("disabled", !this.checked);
+        $("#id_cost_"+this.id.slice(-1)).prop("disabled", !this.checked);
+    });
+    function update_service_cost(that) {
+        $.ajax('/admin/get_product_price/' + that.value, {
+            context: that,
+            success: function(data) {
+                $('#id_cost_'+that.id.slice(-1))[0].value = data.price;
+            }
+        });
+    }
+    $("[id^=id_service_]").change(function() {
+        update_service_cost(this);
+    })
+</script>

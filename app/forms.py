@@ -32,6 +32,7 @@ class CreateAppointmentForm(forms.Form):
         for category in ProductCategory.objects.filter(service=True):
             self.fields['show_{}'.format(category.id)] = forms.BooleanField(label=category.name, required=False)
             self.fields['service_{}'.format(category.id)] = forms.ModelChoiceField(Product.objects.filter(product_category=category), label='', required=False)
+            self.fields['cost_{}'.format(category.id)] = forms.DecimalField(min_value=0, label='Стоимость', required=False)
 
     def clean(self):
         cleaned_data = super(CreateAppointmentForm, self).clean()
@@ -41,6 +42,8 @@ class CreateAppointmentForm(forms.Form):
                 raise forms.ValidationError('Did not select service in "{}" category.'.format(category.name))
             if cleaned_data['show_{}'.format(category.id)] and cleaned_data['service_{}'.format(category.id)]:
                 at_least_one = True
+            if cleaned_data['show_{}'.format(category.id)] and not cleaned_data['cost_{}'.format(category.id)]:
+                raise forms.ValidationError('Enter cost.')
         if not at_least_one:
             raise forms.ValidationError('Choose at least one service.')
 
@@ -50,7 +53,7 @@ class CreateAppointmentForm(forms.Form):
 
 
 class OrderAppointmentForm(forms.Form):
-    category = forms.ModelChoiceField(ProductCategory.objects.all(), label='Категория')
+    category = forms.ModelChoiceField(ProductCategory.objects.filter(service=False), label='Категория')
     product = ChainedModelChoiceField('app', 'Product', 'category', 'product_category', show_all=False, auto_choose=True, label='Товар')
-    quantity = forms.IntegerField()
+    quantity = forms.IntegerField(min_value=1, initial=1)
     cost = forms.DecimalField()
