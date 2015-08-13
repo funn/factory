@@ -123,10 +123,10 @@ def daily_schedule(request, year, month, day):
 def create_appointment(request, barber):
     barber = get_object_or_404(Barber, pk=barber)
     if request.method == 'POST':
+        date = make_aware(datetime.strptime(request.POST['date'], '%a, %d %b %Y %H:%M:%S %Z'), utc).astimezone(timezone(settings.TIME_ZONE))
         form = CreateAppointmentForm(request.POST)
         status = 400
         if form.is_valid():
-            date = make_aware(datetime.strptime(request.POST['date'], '%a, %d %b %Y %H:%M:%S %Z'), utc).astimezone(timezone(settings.TIME_ZONE))
             duration = form.cleaned_data['duration']
             if barber.is_available(date, duration):
                 appointment = Appointment(customer=form.cleaned_data['customer'], barber=barber, comment=form.cleaned_data['comment'])
@@ -144,7 +144,7 @@ def create_appointment(request, barber):
 
         return render(request, 'admin/appointment_result.html', {'status': status})
 
-    form = CreateAppointmentForm()
+    form = CreateAppointmentForm(hour=int(request.GET['hour'][:2]))
     context = dict(
         admin.site.each_context(request),
         barber=barber,
@@ -157,8 +157,11 @@ def edit_appointment(request, appointment):
     appointment = get_object_or_404(Appointment, pk=appointment)
     EditAppointmentFormset = formset_factory(OrderAppointmentForm, can_delete=True)
 
-    formset = EditAppointmentFormset()
-    form = CreateAppointmentForm()
+    if request.method == 'POST':
+        pass
+    else:
+        formset = EditAppointmentFormset()
+        form = CreateAppointmentForm(hour=EventRelation.objects.get_events_for_object(appointment).values()[0]['start'].astimezone(timezone(settings.TIME_ZONE)).hour)
 
     return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset, 'barber': appointment.barber, 'form': form})
 

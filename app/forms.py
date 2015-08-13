@@ -28,7 +28,9 @@ class MonthlyScheduleForm(forms.Form):
 
 class CreateAppointmentForm(forms.Form):
     def __init__(self, *args, **kwargs):
+        hour = kwargs.pop('hour')
         super(CreateAppointmentForm, self).__init__(*args, **kwargs)
+        self.fields['duration'] = forms.ChoiceField(choices=((str(x), x) for x in range(1, settings.DAY_END - hour + 1)), label='Длительность')
         for category in ProductCategory.objects.filter(service=True):
             self.fields['show_{}'.format(category.id)] = forms.BooleanField(label=category.name, required=False)
             self.fields['service_{}'.format(category.id)] = forms.ModelChoiceField(Product.objects.filter(product_category=category), label='', required=False)
@@ -48,7 +50,6 @@ class CreateAppointmentForm(forms.Form):
             raise forms.ValidationError('Choose at least one service.')
 
     customer = autocomplete_light.forms.ModelChoiceField(Customer.objects.all(), widget=autocomplete_light.ChoiceWidget('CustomerAutocomplete'), label='Клиент')
-    duration = forms.ChoiceField(choices=((str(x), x) for x in range(1, settings.DAY_END - settings.DAY_START + 1)), label='Длительность')
     comment = forms.CharField(widget=forms.Textarea, label='Дополнительно', required=False)
 
 
