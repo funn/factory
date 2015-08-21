@@ -57,4 +57,16 @@ class OrderAppointmentForm(forms.Form):
     category = forms.ModelChoiceField(ProductCategory.objects.filter(service=False), label='Категория')
     product = ChainedModelChoiceField('app', 'Product', 'category', 'product_category', show_all=False, auto_choose=True, label='Товар')
     quantity = forms.IntegerField(min_value=1, initial=1)
-    cost = forms.DecimalField()
+    cost = forms.DecimalField(min_value=0)
+
+class EditAppointmentBaseFormset(forms.formsets.BaseFormSet):
+    def clean(self):
+        if any(self.errors):
+            return
+        products = []
+        for form in self.forms:
+            product = form.cleaned_data['product']
+            if form not in self.deleted_forms:
+                if product in products:
+                    raise forms.ValidationError('No product duplicates allowed.')
+                products.append(product)

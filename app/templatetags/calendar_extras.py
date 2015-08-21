@@ -20,8 +20,8 @@ def render_appointment(events, time, barber, table_nodes): # TODO: This is plain
             name = '<p class="customer_name">{}</p>'.format(occ_tuple[1].customer.name)
             phone = '<p class="customer_phone">{}</p>'.format(occ_tuple[1].customer.phone)
             service_list = ''
-            for service in occ_tuple[1].services.all():
-                service_list += '<li class="list-group-item">{}: {}</li>'.format(service.product_category.name, service.name)
+            for service in occ_tuple[1].orders.filter(category__service=True):
+                service_list += '<li class="list-group-item">{}: {}</li>'.format(service.category.name, service.product.name)
             service_list = '<ul class="list-group">' + service_list + '</ul>'
             return '<td rowspan="{}" class="app_edit"><a href="/admin/edit_appointment/{}"><span class="glyphicon glyphicon-user"></a>{}{}{}</td>'.format(occ_tuple[0].end.astimezone(timezone(settings.TIME_ZONE)).hour - occ_tuple[0].start.astimezone(timezone(settings.TIME_ZONE)).hour, occ_tuple[1].id, name, phone, service_list)
     if int(time[:2]) in [hour[0] for hour in table_nodes[barber]]:

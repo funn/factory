@@ -1,8 +1,7 @@
-{% load crispy_forms_tags %}
-{% load staticfiles %}
-
 <div class="modal-dialog modal-sm">
     <div class="modal-content">
-        {% include 'admin/create_appointment_form.html' %}
+        <form id="appointmentForm" method='post' class="form" role="form" action='{% url 'admin:create_appointment' barber.id %}'>
+            {% include 'admin/create_appointment_form.html' %}
+        </form>
     </div>
 </div>

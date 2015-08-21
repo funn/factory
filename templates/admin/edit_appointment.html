@@ -1,8 +1,10 @@
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="clearfix">
-            <div class="col-2">{% include 'admin/create_appointment_form.html' %}</div>
-            <div class="col-2">{% include 'admin/edit_appointment_form.html' %}</div>
+            <form id="appointmentForm" method='post' class="form" role="form" action='{% url 'admin:edit_appointment' appointment.id %}'>
+                <div class="col-2">{% include 'admin/create_appointment_form.html' %}</div>
+                <div class="col-2">{% include 'admin/edit_appointment_form.html' %}</div>
+            </form>
         </div>
     </div>
     <script>

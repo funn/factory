@@ -15,8 +15,8 @@ from schedule.models.events import Event, EventRelation
 from schedule.models.calendars import Calendar
 from schedule.periods import Day, Month
 
-from .models import Barber, Appointment, ProductCategory, Product
-from .forms import MonthlyScheduleForm, CreateAppointmentForm, OrderAppointmentForm
+from .models import Barber, Appointment, ProductCategory, Product, OrderDetail
+from .forms import MonthlyScheduleForm, CreateAppointmentForm, OrderAppointmentForm, EditAppointmentBaseFormset
 
 
 def monthly_schedule(request, year, month):
@@ -124,16 +124,17 @@ def create_appointment(request, barber):
     barber = get_object_or_404(Barber, pk=barber)
     if request.method == 'POST':
         date = make_aware(datetime.strptime(request.POST['date'], '%a, %d %b %Y %H:%M:%S %Z'), utc).astimezone(timezone(settings.TIME_ZONE))
-        form = CreateAppointmentForm(request.POST)
+        form = CreateAppointmentForm(request.POST, hour=date.hour)
         status = 400
         if form.is_valid():
             duration = form.cleaned_data['duration']
             if barber.is_available(date, duration):
                 appointment = Appointment(customer=form.cleaned_data['customer'], barber=barber, comment=form.cleaned_data['comment'])
-                appointment.save()
+                appointment.save() # TODO: Try-Except
                 for category in ProductCategory.objects.filter(service=True):
                     if form.cleaned_data['show_{}'.format(category.id)]:
-                        appointment.services.add(form.cleaned_data['service_{}'.format(category.id)])
+                        order = OrderDetail.objects.create(category=category, product=form.cleaned_data['service_{}'.format(category.id)], quantity=1, cost=form.cleaned_data['cost_{}'.format(category.id)], date=date, barber=barber, customer=form.cleaned_data['customer'], appointment_fk=appointment)
+                        appointment.orders.add(order)
                 event = Event(start=date, end=date+timedelta(hours=int(duration)))
                 event.save()
                 calendar = Calendar.objects.get(name='client_schedule')
@@ -155,13 +156,75 @@ def create_appointment(request, barber):
 
 def edit_appointment(request, appointment):
     appointment = get_object_or_404(Appointment, pk=appointment)
-    EditAppointmentFormset = formset_factory(OrderAppointmentForm, can_delete=True)
+    EditAppointmentFormset = formset_factory(OrderAppointmentForm, formset=EditAppointmentBaseFormset, can_delete=True, extra=0)
+    date_start = EventRelation.objects.get_events_for_object(appointment).values()[0]['start'].astimezone(timezone(settings.TIME_ZONE))
+    date_end = EventRelation.objects.get_events_for_object(appointment).values()[0]['end'].astimezone(timezone(settings.TIME_ZONE))
+
+    initial_data_form = {'customer': appointment.customer, 'comment':appointment.comment, 'duration': date_end.hour - date_start.hour}
+    for service in ProductCategory.objects.filter(service=True):
+        found = False
+        for order in appointment.orders.all():
+            if service == order.category:
+                initial_data_form['show_{}'.format(service.id)] = True
+                initial_data_form['service_{}'.format(service.id)] = order.product
+                initial_data_form['cost_{}'.format(service.id)] = order.cost
+                found = True
+        if not found:
+            initial_data_form['show_{}'.format(service.id)] = False
+
+    initial_data_formset = []
+    for order in appointment.orders.filter(category__service=False):
+        initial_data_formset.append({'category': order.category,'product': order.product, 'quantity': order.quantity, 'cost': order.cost})
 
     if request.method == 'POST':
-        pass
+        error = False
+        formset = EditAppointmentFormset(request.POST, initial=initial_data_formset)
+        form = CreateAppointmentForm(request.POST, hour=date_start.hour, initial=initial_data_form)
+        if form.is_valid() and formset.is_valid():
+            if form.has_changed():
+                if appointment.barber.is_available(date_start, form.cleaned_data['duration'], appointment.customer):
+                    event = EventRelation.objects.get_events_for_object(appointment).get()
+                    event.end = event.start + timedelta(hours=int(form.cleaned_data['duration']))
+                    event.save()
+                else:
+                    error = True # TODO: try/except with rollback.
+                appointment.customer = form.cleaned_data['customer']
+                appointment.comment = form.cleaned_data['comment']
+                for service in ProductCategory.objects.filter(service=True):
+                    order = appointment.orders.filter(category=service)
+                    if order:
+                        order = order.get()
+                        if form.cleaned_data['show_{}'.format(service.id)]:
+                            order.cost = form.cleaned_data['cost_{}'.format(service.id)]
+                            order.save()
+                        else:
+                            order.delete()
+                    else:
+                        order = OrderDetail.objects.create(category=service, product=form.cleaned_data['service_{}'.format(service.id)], quantity=1, cost=form.cleaned_data['cost_{}'.format(service.id)], date=date_start, barber=appointment.barber, customer=form.cleaned_data['customer'], appointment_fk=appointment)
+                        appointment.orders.add(order)
+                if not error:
+                    appointment.save()
+            if formset.has_changed():
+                for index, form in enumerate(formset):
+                    if form.has_changed():
+                        product = initial_data_formset[index]['product'] if index < len(initial_data_formset) else None
+                        order = appointment.orders.filter(product=product)
+                        if form in formset.deleted_forms and order:
+                            order = order.get()
+                            order.delete()
+                        else:
+                            if order:
+                                order = order.get()
+                                order.product = form.cleaned_data['product']
+                                order.cost = form.cleaned_data['cost']
+                                order.quantity = form.cleaned_data['quantity']
+                                order.save()
+                            else:
+                                order = OrderDetail.objects.create(category=form.cleaned_data['category'], product=form.cleaned_data['product'], quantity=form.cleaned_data['quantity'], cost=form.cleaned_data['cost'], date=date_start, barber=appointment.barber, customer=appointment.customer, appointment_fk=appointment)
+                                appointment.orders.add(order)
     else:
-        formset = EditAppointmentFormset()
-        form = CreateAppointmentForm(hour=EventRelation.objects.get_events_for_object(appointment).values()[0]['start'].astimezone(timezone(settings.TIME_ZONE)).hour)
+        formset = EditAppointmentFormset(initial=initial_data_formset)
+        form = CreateAppointmentForm(hour=date_start.hour, initial=initial_data_form)
 
     return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset, 'barber': appointment.barber, 'form': form})
 

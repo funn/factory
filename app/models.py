@@ -60,7 +60,7 @@ class Barber(PhoneValidationMixin):
 
     objects = BarberManager()
 
-    def is_available(self, date, duration):
+    def is_available(self, date, duration, customer=None):
         if date.hour < settings.DAY_START or date.hour + int(duration) > settings.DAY_END:
             return False # Not operating on this hours.
 
@@ -68,7 +68,7 @@ class Barber(PhoneValidationMixin):
         if not Day(barber_schedule_data, date).has_occurrences():
             return False # Barber doesn't work this day.
 
-        client_schedule_data = [Event.objects.get(pk=EventRelation.objects.filter(event__calendar__name='client_schedule').get(object_id=appointment.id).event_id) for appointment in Appointment.objects.filter(barber=self)]
+        client_schedule_data = [Event.objects.get(pk=EventRelation.objects.filter(event__calendar__name='client_schedule').get(object_id=appointment.id).event_id) for appointment in Appointment.objects.filter(barber=self) if appointment.customer != customer]
         if Period(client_schedule_data, date + timedelta(minutes=1), date + timedelta(hours=int(duration)-1, minutes=59)).has_occurrences():
             return False # Barber got another client at this time.
 
@@ -87,13 +87,6 @@ class Customer(PhoneValidationMixin):
         return "{}, {}".format(self.name, self.phone)
 
 
-class Appointment(models.Model):
-    customer = models.ForeignKey(Customer, verbose_name='Клиент')
-    barber = models.ForeignKey(Barber, verbose_name='Парикмахер')
-    services = models.ManyToManyField(Product)
-    comment = models.TextField(verbose_name='Дополнительно', blank=True)
-
-
 class OrderDetail(models.Model):
     category = models.ForeignKey(ProductCategory, verbose_name='Категория')
     product = ChainedForeignKey(Product, chained_field='category', chained_model_field='product_category', show_all=False, auto_choose=True, verbose_name='Товар')
@@ -102,4 +95,12 @@ class OrderDetail(models.Model):
     date = models.DateTimeField(verbose_name='Время', auto_now_add=True)
     barber = models.ForeignKey(Barber, verbose_name='Парикмахер')
     customer = models.ForeignKey(Customer, verbose_name='Клиент')
-    appointment = models.ForeignKey(Appointment, null=True, blank=True)
+    appointment_fk = models.ForeignKey('Appointment', null=True, blank=True)
+
+
+class Appointment(models.Model):
+    customer = models.ForeignKey(Customer, verbose_name='Клиент')
+    barber = models.ForeignKey(Barber, verbose_name='Парикмахер')
+    orders = models.ManyToManyField(OrderDetail)
+    comment = models.TextField(verbose_name='Дополнительно', blank=True)
+
