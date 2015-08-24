@@ -41,19 +41,23 @@ class CreateAppointmentForm(forms.Form):
         at_least_one = False
         for category in ProductCategory.objects.filter(service=True):
             if cleaned_data['show_{}'.format(category.id)] and not cleaned_data['service_{}'.format(category.id)]:
-                raise forms.ValidationError('Did not select service in "{}" category.'.format(category.name))
+                raise forms.ValidationError('Не выбрана услуга в категории {}.'.format(category.name))
             if cleaned_data['show_{}'.format(category.id)] and cleaned_data['service_{}'.format(category.id)]:
                 at_least_one = True
             if cleaned_data['show_{}'.format(category.id)] and not cleaned_data['cost_{}'.format(category.id)]:
-                raise forms.ValidationError('Enter cost.')
+                raise forms.ValidationError('Не указана цена в категории {}.'.format(category.name))
         if not at_least_one:
-            raise forms.ValidationError('Choose at least one service.')
+            raise forms.ValidationError('Выберите хотя бы одну услугу.')
 
     customer = autocomplete_light.forms.ModelChoiceField(Customer.objects.all(), widget=autocomplete_light.ChoiceWidget('CustomerAutocomplete'), label='Клиент')
     comment = forms.CharField(widget=forms.Textarea, label='Дополнительно', required=False)
 
 
 class OrderAppointmentForm(forms.Form):
+    def __init__(self, *arg, **kwarg):
+        super(OrderAppointmentForm, self).__init__(*arg, **kwarg)
+        self.empty_permitted = False
+
     category = forms.ModelChoiceField(ProductCategory.objects.filter(service=False), label='Категория')
     product = ChainedModelChoiceField('app', 'Product', 'category', 'product_category', show_all=False, auto_choose=True, label='Товар')
     quantity = forms.IntegerField(min_value=1, initial=1)
@@ -68,5 +72,5 @@ class EditAppointmentBaseFormset(forms.formsets.BaseFormSet):
             product = form.cleaned_data['product']
             if form not in self.deleted_forms:
                 if product in products:
-                    raise forms.ValidationError('No product duplicates allowed.')
+                    raise forms.ValidationError('{} добавлен несколько раз.'.format(product.name))
                 products.append(product)

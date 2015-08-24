@@ -2,12 +2,17 @@
     <div class="modal-content">
         <div class="clearfix">
             <form id="appointmentForm" method='post' class="form" role="form" action='{% url 'admin:edit_appointment' appointment.id %}'>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">{{ barber.name }}&nbsp;{{ time }}</h4>
+                </div>
                 <div class="col-2">{% include 'admin/create_appointment_form.html' %}</div>
                 <div class="col-2">{% include 'admin/edit_appointment_form.html' %}</div>
             </form>
         </div>
     </div>
     <script>
+        update_form($('#appointmentForm'));
         function update_cost(product_id, quantity, target) {
             if (product_id > 0 && quantity > 0) {
                 $.ajax('/admin/get_product_price/' + product_id, {

@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, JsonResponse
 from django.utils.timezone import make_aware, utc
 from django.conf import settings
+from django.db import transaction
 
 from schedule.models.events import Event, EventRelation
 from schedule.models.calendars import Calendar
@@ -124,6 +125,7 @@ def create_appointment(request, barber):
     barber = get_object_or_404(Barber, pk=barber)
     if request.method == 'POST':
         date = make_aware(datetime.strptime(request.POST['date'], '%a, %d %b %Y %H:%M:%S %Z'), utc).astimezone(timezone(settings.TIME_ZONE))
+        time = '{}-00'.format(date.hour)
         form = CreateAppointmentForm(request.POST, hour=date.hour)
         status = 400
         if form.is_valid():
@@ -143,13 +145,15 @@ def create_appointment(request, barber):
                 relation.save()
                 status = 201
 
-        return render(request, 'admin/appointment_result.html', {'status': status})
-
-    form = CreateAppointmentForm(hour=int(request.GET['hour'][:2]))
+        #return render(request, 'admin/appointment_result.html', {'status': status})
+    else:
+        form = CreateAppointmentForm(hour=int(request.GET['hour'][:2]))
+        time = request.GET['hour']
     context = dict(
         admin.site.each_context(request),
         barber=barber,
         form=form,
+        time=time,
     )
     return render(request, 'admin/create_appointment.html', context)
 
@@ -200,11 +204,14 @@ def edit_appointment(request, appointment):
                         else:
                             order.delete()
                     else:
-                        order = OrderDetail.objects.create(category=service, product=form.cleaned_data['service_{}'.format(service.id)], quantity=1, cost=form.cleaned_data['cost_{}'.format(service.id)], date=date_start, barber=appointment.barber, customer=form.cleaned_data['customer'], appointment_fk=appointment)
-                        appointment.orders.add(order)
+                        if form.cleaned_data['show_{}'.format(service.id)]:
+                            order = OrderDetail.objects.create(category=service, product=form.cleaned_data['service_{}'.format(service.id)], quantity=1, cost=form.cleaned_data['cost_{}'.format(service.id)], date=date_start, barber=appointment.barber, customer=form.cleaned_data['customer'], appointment_fk=appointment)
+                            appointment.orders.add(order)
                 if not error:
                     appointment.save()
             if formset.has_changed():
+                bulk_edit = []
+                bulk_create = []
                 for index, form in enumerate(formset):
                     if form.has_changed():
                         product = initial_data_formset[index]['product'] if index < len(initial_data_formset) else None
@@ -214,19 +221,24 @@ def edit_appointment(request, appointment):
                             order.delete()
                         else:
                             if order:
-                                order = order.get()
-                                order.product = form.cleaned_data['product']
-                                order.cost = form.cleaned_data['cost']
-                                order.quantity = form.cleaned_data['quantity']
-                                order.save()
+                                bulk_edit.append((order.get().id, {'product': form.cleaned_data['product'], 'cost': form.cleaned_data['cost'], 'quantity': form.cleaned_data['quantity']}))
                             else:
-                                order = OrderDetail.objects.create(category=form.cleaned_data['category'], product=form.cleaned_data['product'], quantity=form.cleaned_data['quantity'], cost=form.cleaned_data['cost'], date=date_start, barber=appointment.barber, customer=appointment.customer, appointment_fk=appointment)
-                                appointment.orders.add(order)
+                                if form not in formset.deleted_forms:
+                                    bulk_create.append({'category': form.cleaned_data['category'], 'product': form.cleaned_data['product'], 'quantity': form.cleaned_data['quantity'], 'cost': form.cleaned_data['cost']})
+                for bulk in bulk_edit:
+                    order = OrderDetail.objects.get(pk=bulk[0])
+                    order.product = bulk[1]['product']
+                    order.cost = bulk[1]['cost']
+                    order.quantity = bulk[1]['quantity']
+                    order.save()
+                for bulk in bulk_create:
+                    order = OrderDetail.objects.create(category=bulk['category'], product=bulk['product'], quantity=bulk['quantity'], cost=bulk['cost'], date=date_start, barber=appointment.barber, customer=appointment.customer, appointment_fk=appointment)
+                    appointment.orders.add(order)
     else:
         formset = EditAppointmentFormset(initial=initial_data_formset)
         form = CreateAppointmentForm(hour=date_start.hour, initial=initial_data_form)
 
-    return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset, 'barber': appointment.barber, 'form': form})
+    return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset, 'barber': appointment.barber, 'form': form, 'time':'{}-00'.format(date_start.hour)})
 
 
 def get_product_price(request, product_id):

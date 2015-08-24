@@ -2,10 +2,6 @@
 {% load staticfiles %}
 
 
-<div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h4 class="modal-title" id="myModalLabel">{{ barber.name }}&nbsp;<span id="appointmentTime"></span></h4>
-</div>
 <div class="modal-body">
     {{ form|crispy }}
     <div class="modal-footer">

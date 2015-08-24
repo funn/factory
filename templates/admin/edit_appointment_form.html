@@ -1,10 +1,7 @@
 {% load crispy_forms_tags %}
 {% load calendar_extras %}
 
-<div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h4 class="modal-title" id="myModalLabel">{{ appointment.barber.name }}&nbsp;<span id="appointmentTime"></span></h4>
-</div>
+
 <div class="modal-body">
     <div id="formset" data-formset-prefix="{{ formset.prefix }}">
         {{ formset.management_form }}
