@@ -1,5 +1,6 @@
 {% load crispy_forms_tags %}
 {% load calendar_extras %}
+{% load clever_selects_extras %}
 
 
 <div class="modal-body">
@@ -25,6 +26,7 @@
                     {{ formset.empty_form|crispy }}
                     <button type="button" data-formset-delete-button>Delete form</button>
                 </div>
+                {% clever_selects_js_import %}
             {% endescapescript %}
         </script>
 

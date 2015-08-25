@@ -1,7 +1,12 @@
 {% extends "admin/base.html" %}
 {% load staticfiles %}
+{% load clever_selects_extras %}
 
 {% block extrahead %}
     <script src="{% static 'js/jquery.min.js' %}"></script>
     {% include 'autocomplete_light/static.html' %}
+{% endblock %}
+
+{% block footer %}
+    {% clever_selects_js_import %}
 {% endblock %}

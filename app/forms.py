@@ -3,17 +3,19 @@ from django.conf import settings
 
 import autocomplete_light
 
-from smart_selects.form_fields import ChainedModelChoiceField
+from clever_selects.form_fields import ChainedModelChoiceField
+from clever_selects.forms import ChainedChoicesForm, ChainedChoicesModelForm
 
 from .models import OrderDetail, Customer, ProductCategory, Product
 
 
-class OrderDetailForm(forms.ModelForm):
+class OrderDetailForm(ChainedChoicesModelForm):
     class Meta:
         model = OrderDetail
         exclude = []
 
     customer = autocomplete_light.forms.ModelChoiceField(Customer.objects.all(), widget=autocomplete_light.ChoiceWidget('CustomerAutocomplete'), label='Клиент')
+    product = ChainedModelChoiceField(parent_field='category', ajax_url='/ajax/chained-products/', label='Товар', model=Product)
 
 
 class MonthlyScheduleForm(forms.Form):
@@ -53,15 +55,15 @@ class CreateAppointmentForm(forms.Form):
     comment = forms.CharField(widget=forms.Textarea, label='Дополнительно', required=False)
 
 
-class OrderAppointmentForm(forms.Form):
+class OrderAppointmentForm(ChainedChoicesForm):
     def __init__(self, *arg, **kwarg):
         super(OrderAppointmentForm, self).__init__(*arg, **kwarg)
         self.empty_permitted = False
 
     category = forms.ModelChoiceField(ProductCategory.objects.filter(service=False), label='Категория')
-    product = ChainedModelChoiceField('app', 'Product', 'category', 'product_category', show_all=False, auto_choose=True, label='Товар')
-    quantity = forms.IntegerField(min_value=1, initial=1)
-    cost = forms.DecimalField(min_value=0)
+    product = ChainedModelChoiceField(parent_field='category', ajax_url='/ajax/chained-products/', label='Товар', model=Product)
+    quantity = forms.IntegerField(min_value=1, initial=1, label='Количество')
+    cost = forms.DecimalField(min_value=0, label='Цена')
 
 class EditAppointmentBaseFormset(forms.formsets.BaseFormSet):
     def clean(self):

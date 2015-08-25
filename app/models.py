@@ -7,8 +7,6 @@ from django.conf import settings
 from schedule.models.events import Event, EventRelation
 from schedule.periods import Day, Period
 
-from smart_selects.db_fields import ChainedForeignKey
-
 
 phone_regex = RegexValidator(regex=r'^(\+7|8)?\d{10}$', message="Некорректный номер телефона, ожидаемый ввод +79614567890 или 89614567890 или 9614567890")
 
@@ -89,7 +87,7 @@ class Customer(PhoneValidationMixin):
 
 class OrderDetail(models.Model):
     category = models.ForeignKey(ProductCategory, verbose_name='Категория')
-    product = ChainedForeignKey(Product, chained_field='category', chained_model_field='product_category', show_all=False, auto_choose=True, verbose_name='Товар')
+    product = models.ForeignKey(Product, verbose_name='Товар')
     quantity = models.PositiveIntegerField(verbose_name='Количество', validators=[MinValueValidator(1)], default=1)
     cost = models.DecimalField(verbose_name='Цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
     date = models.DateTimeField(verbose_name='Время', auto_now_add=True)

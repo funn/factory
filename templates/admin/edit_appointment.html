@@ -1,3 +1,6 @@
+{% load clever_selects_extras %}
+{% load crispy_forms_tags %}
+
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="clearfix">
@@ -7,10 +10,14 @@
                     <h4 class="modal-title" id="myModalLabel">{{ barber.name }}&nbsp;{{ time }}</h4>
                 </div>
                 <div class="col-2">{% include 'admin/create_appointment_form.html' %}</div>
-                <div class="col-2">{% include 'admin/edit_appointment_form.html' %}</div>
+                <div id="editForm" class="col-2">
+                    {{ formset.non_form_errors }}
+                    {% include 'admin/edit_appointment_form.html' %}
+                </div>
             </form>
         </div>
     </div>
+    {% clever_selects_js_import %}
     <script>
         update_form($('#appointmentForm'));
         function update_cost(product_id, quantity, target) {

@@ -22,7 +22,7 @@ $(function () {
                 }
             };
             selector.ajaxForm(form_options);
-        }
+        };
         $.ajax({
             context: this,
             url: this.getAttribute('href', 2),

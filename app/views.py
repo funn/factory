@@ -10,11 +10,12 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, JsonResponse
 from django.utils.timezone import make_aware, utc
 from django.conf import settings
-from django.db import transaction
 
 from schedule.models.events import Event, EventRelation
 from schedule.models.calendars import Calendar
 from schedule.periods import Day, Month
+
+from clever_selects.views import ChainedSelectChoicesView
 
 from .models import Barber, Appointment, ProductCategory, Product, OrderDetail
 from .forms import MonthlyScheduleForm, CreateAppointmentForm, OrderAppointmentForm, EditAppointmentBaseFormset
@@ -183,29 +184,29 @@ def edit_appointment(request, appointment):
     if request.method == 'POST':
         error = False
         formset = EditAppointmentFormset(request.POST, initial=initial_data_formset)
-        form = CreateAppointmentForm(request.POST, hour=date_start.hour, initial=initial_data_form)
-        if form.is_valid() and formset.is_valid():
-            if form.has_changed():
-                if appointment.barber.is_available(date_start, form.cleaned_data['duration'], appointment.customer):
+        form_app = CreateAppointmentForm(request.POST, hour=date_start.hour, initial=initial_data_form)
+        if form_app.is_valid() and formset.is_valid():
+            if form_app.has_changed():
+                if appointment.barber.is_available(date_start, form_app.cleaned_data['duration'], appointment.customer):
                     event = EventRelation.objects.get_events_for_object(appointment).get()
-                    event.end = event.start + timedelta(hours=int(form.cleaned_data['duration']))
+                    event.end = event.start + timedelta(hours=int(form_app.cleaned_data['duration']))
                     event.save()
                 else:
                     error = True # TODO: try/except with rollback.
-                appointment.customer = form.cleaned_data['customer']
-                appointment.comment = form.cleaned_data['comment']
+                appointment.customer = form_app.cleaned_data['customer']
+                appointment.comment = form_app.cleaned_data['comment']
                 for service in ProductCategory.objects.filter(service=True):
                     order = appointment.orders.filter(category=service)
                     if order:
                         order = order.get()
-                        if form.cleaned_data['show_{}'.format(service.id)]:
-                            order.cost = form.cleaned_data['cost_{}'.format(service.id)]
+                        if form_app.cleaned_data['show_{}'.format(service.id)]:
+                            order.cost = form_app.cleaned_data['cost_{}'.format(service.id)]
                             order.save()
                         else:
                             order.delete()
                     else:
-                        if form.cleaned_data['show_{}'.format(service.id)]:
-                            order = OrderDetail.objects.create(category=service, product=form.cleaned_data['service_{}'.format(service.id)], quantity=1, cost=form.cleaned_data['cost_{}'.format(service.id)], date=date_start, barber=appointment.barber, customer=form.cleaned_data['customer'], appointment_fk=appointment)
+                        if form_app.cleaned_data['show_{}'.format(service.id)]:
+                            order = OrderDetail.objects.create(category=service, product=form_app.cleaned_data['service_{}'.format(service.id)], quantity=1, cost=form_app.cleaned_data['cost_{}'.format(service.id)], date=date_start, barber=appointment.barber, customer=form_app.cleaned_data['customer'], appointment_fk=appointment)
                             appointment.orders.add(order)
                 if not error:
                     appointment.save()
@@ -236,9 +237,19 @@ def edit_appointment(request, appointment):
                     appointment.orders.add(order)
     else:
         formset = EditAppointmentFormset(initial=initial_data_formset)
-        form = CreateAppointmentForm(hour=date_start.hour, initial=initial_data_form)
+        form_app = CreateAppointmentForm(hour=date_start.hour, initial=initial_data_form)
 
-    return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset, 'barber': appointment.barber, 'form': form, 'time':'{}-00'.format(date_start.hour)})
+    return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset, 'barber': appointment.barber, 'form': form_app, 'time':'{}-00'.format(date_start.hour)})
+
+
+class AjaxChainedProducts(ChainedSelectChoicesView):
+    def get_choices(self):
+        vals_list = []
+        id_list = []
+        for product in Product.objects.filter(product_category__id=self.parent_value):
+            id_list.append(product.id)
+            vals_list.append(product.name)
+        return tuple(zip(id_list, vals_list))
 
 
 def get_product_price(request, product_id):
