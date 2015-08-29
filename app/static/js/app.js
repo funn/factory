@@ -3,12 +3,15 @@ global.$ = global.jQuery;
 require('jquery-form');
 require('./jquery.formset.js');
 require('bootstrap');
+var moment = require('eonasdan-bootstrap-datetimepicker/node_modules/moment');
+require('eonasdan-bootstrap-datetimepicker');
+require('eonasdan-bootstrap-datetimepicker/node_modules/moment/locale/ru');
 
 $(function () {
+    var date_split = this.baseURI.split('/');
     $('#main_table a').click(function (event) { // Maybe not so general?
         event.preventDefault();
         var hour = this.parentNode.parentNode.children[0].textContent;
-        var date_split = this.baseURI.split('/');
         var hour_split = hour.split('-');
         var date = new Date(date_split[5], date_split[6] - 1, date_split[7], hour_split[0], hour_split[1]);
         window.update_form = function update_form(selector) {
@@ -36,5 +39,15 @@ $(function () {
             }
         });
         return false;
+    });
+
+    $('#datetimepicker').datetimepicker({
+        locale: 'ru',
+        format: 'D/MM/YYYY',
+        defaultDate: date_split[5] + '/' + date_split[6] + '/' + date_split[7]
+    });
+    $('#datetimepicker').on('dp.change', function (e) {
+        var str = document.baseURI;
+        window.location = str.replace(/(.*)\/\d+\/\d+\/\d+\/$/g, '$1/' + e.date.format('YYYY') + '/' + e.date.format('M') + '/' + e.date.format('D') + '/');
     });
 });
