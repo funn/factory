@@ -125,36 +125,32 @@ def daily_schedule(request, year, month, day):
 def create_appointment(request, barber):
     barber = get_object_or_404(Barber, pk=barber)
     if request.method == 'POST':
-        date = make_aware(datetime.strptime(request.POST['date'], '%a, %d %b %Y %H:%M:%S %Z'), utc).astimezone(timezone(settings.TIME_ZONE))
-        time = '{}-00'.format(date.hour)
-        form = CreateAppointmentForm(request.POST, hour=date.hour)
-        status = 400
+        form = CreateAppointmentForm(request.POST)
         if form.is_valid():
             duration = form.cleaned_data['duration']
-            if barber.is_available(date, duration):
-                appointment = Appointment(customer=form.cleaned_data['customer'], barber=barber, comment=form.cleaned_data['comment'])
-                appointment.save() # TODO: Try-Except
-                for category in ProductCategory.objects.filter(service=True):
-                    if form.cleaned_data['show_{}'.format(category.id)]:
-                        order = OrderDetail.objects.create(category=category, product=form.cleaned_data['service_{}'.format(category.id)], quantity=1, cost=form.cleaned_data['cost_{}'.format(category.id)], date=date, barber=barber, customer=form.cleaned_data['customer'], appointment_fk=appointment)
-                        appointment.orders.add(order)
-                event = Event(start=date, end=date+timedelta(hours=int(duration)))
-                event.save()
-                calendar = Calendar.objects.get(name='client_schedule')
-                calendar.events.add(event)
-                relation = EventRelation.objects.create_relation(event, appointment)
-                relation.save()
-                status = 201
-
-        #return render(request, 'admin/appointment_result.html', {'status': status})
+            date = form.cleaned_data['date']
+            appointment = Appointment(customer=form.cleaned_data['customer'], barber=barber, comment=form.cleaned_data['comment'])
+            appointment.save() # TODO: Try-Except
+            for category in ProductCategory.objects.filter(service=True):
+                if form.cleaned_data['show_{}'.format(category.id)]:
+                    order = OrderDetail.objects.create(category=category, product=form.cleaned_data['service_{}'.format(category.id)], quantity=1, cost=form.cleaned_data['cost_{}'.format(category.id)], date=date, barber=barber, customer=form.cleaned_data['customer'], appointment_fk=appointment)
+                    appointment.orders.add(order)
+            event = Event(start=date, end=date+timedelta(hours=int(duration)))
+            event.save()
+            calendar = Calendar.objects.get(name='client_schedule')
+            calendar.events.add(event)
+            relation = EventRelation.objects.create_relation(event, appointment)
+            relation.save()
+        else:
+            date =datetime.now() # Ugly as shit.
     else:
-        form = CreateAppointmentForm(hour=int(request.GET['hour'][:2]))
-        time = request.GET['hour']
+        date = make_aware(datetime.strptime(request.GET['date'], '%a, %d %b %Y %H:%M:%S %Z'), utc).astimezone(timezone(settings.TIME_ZONE))
+        form = CreateAppointmentForm(date=date, barber=barber)
     context = dict(
         admin.site.each_context(request),
         barber=barber,
         form=form,
-        time=time,
+        time='{}-00'.format(date.hour),
     )
     return render(request, 'admin/create_appointment.html', context)
 
@@ -182,34 +178,31 @@ def edit_appointment(request, appointment):
         initial_data_formset.append({'category': order.category,'product': order.product, 'quantity': order.quantity, 'cost': order.cost})
 
     if request.method == 'POST':
-        error = False
         formset = EditAppointmentFormset(request.POST, initial=initial_data_formset)
-        form_app = CreateAppointmentForm(request.POST, hour=date_start.hour, initial=initial_data_form)
+        form_app = CreateAppointmentForm(request.POST, date=date_start, initial=initial_data_form, appointment=appointment)
         if form_app.is_valid() and formset.is_valid():
             if form_app.has_changed():
-                if appointment.barber.is_available(date_start, form_app.cleaned_data['duration'], appointment.customer):
-                    event = EventRelation.objects.get_events_for_object(appointment).get()
-                    event.end = event.start + timedelta(hours=int(form_app.cleaned_data['duration']))
-                    event.save()
-                else:
-                    error = True # TODO: try/except with rollback.
+                date = form_app.cleaned_data['date']
+                event = EventRelation.objects.get_events_for_object(appointment).get()
+                event.start = date
+                event.end = event.start + timedelta(hours=int(form_app.cleaned_data['duration']))
+                event.save()
                 appointment.customer = form_app.cleaned_data['customer']
                 appointment.comment = form_app.cleaned_data['comment']
-                for service in ProductCategory.objects.filter(service=True):
-                    order = appointment.orders.filter(category=service)
-                    if order:
-                        order = order.get()
-                        if form_app.cleaned_data['show_{}'.format(service.id)]:
-                            order.cost = form_app.cleaned_data['cost_{}'.format(service.id)]
-                            order.save()
-                        else:
-                            order.delete()
+                appointment.barber = form_app.cleaned_data['barber']
+            for service in ProductCategory.objects.filter(service=True):
+                order = appointment.orders.filter(category=service)
+                if order:
+                    order = order.get()
+                    if form_app.cleaned_data['show_{}'.format(service.id)]:
+                        order.cost = form_app.cleaned_data['cost_{}'.format(service.id)]
+                        order.save()
                     else:
-                        if form_app.cleaned_data['show_{}'.format(service.id)]:
-                            order = OrderDetail.objects.create(category=service, product=form_app.cleaned_data['service_{}'.format(service.id)], quantity=1, cost=form_app.cleaned_data['cost_{}'.format(service.id)], date=date_start, barber=appointment.barber, customer=form_app.cleaned_data['customer'], appointment_fk=appointment)
-                            appointment.orders.add(order)
-                if not error:
-                    appointment.save()
+                        order.delete()
+                else:
+                    if form_app.cleaned_data['show_{}'.format(service.id)]:
+                        order = OrderDetail.objects.create(category=service, product=form_app.cleaned_data['service_{}'.format(service.id)], quantity=1, cost=form_app.cleaned_data['cost_{}'.format(service.id)], date=date_start, barber=appointment.barber, customer=form_app.cleaned_data['customer'], appointment_fk=appointment)
+                        appointment.orders.add(order)
             if formset.has_changed():
                 bulk_edit = []
                 bulk_create = []
@@ -235,9 +228,10 @@ def edit_appointment(request, appointment):
                 for bulk in bulk_create:
                     order = OrderDetail.objects.create(category=bulk['category'], product=bulk['product'], quantity=bulk['quantity'], cost=bulk['cost'], date=date_start, barber=appointment.barber, customer=appointment.customer, appointment_fk=appointment)
                     appointment.orders.add(order)
+            appointment.save()
     else:
         formset = EditAppointmentFormset(initial=initial_data_formset)
-        form_app = CreateAppointmentForm(hour=date_start.hour, initial=initial_data_form)
+        form_app = CreateAppointmentForm(date=date_start, initial=initial_data_form, barber=appointment.barber)
 
     return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset, 'barber': appointment.barber, 'form': form_app, 'time':'{}-00'.format(date_start.hour)})
 

@@ -3,9 +3,6 @@ global.$ = global.jQuery;
 require('jquery-form');
 require('./jquery.formset.js');
 require('bootstrap');
-var moment = require('eonasdan-bootstrap-datetimepicker/node_modules/moment');
-require('eonasdan-bootstrap-datetimepicker');
-require('eonasdan-bootstrap-datetimepicker/node_modules/moment/locale/ru');
 
 $(function () {
     var date_split = this.baseURI.split('/');
@@ -17,9 +14,6 @@ $(function () {
         window.update_form = function update_form(selector) {
             var form_options = {
                 target: '#modal',
-                data: {
-                    date: date.toUTCString()
-                },
                 success: function () { // Have to show errors here.
                     //setTimeout(function () {window.location.reload();}, 2000);
                 }
@@ -30,7 +24,7 @@ $(function () {
             context: this,
             url: this.getAttribute('href', 2),
             data: {
-                hour: hour
+                date: date.toUTCString()
             },
             success: function (data) {
                 var modal = $('#modal');
@@ -39,15 +33,5 @@ $(function () {
             }
         });
         return false;
-    });
-
-    $('#datetimepicker').datetimepicker({
-        locale: 'ru',
-        format: 'D/MM/YYYY',
-        defaultDate: date_split[5] + '/' + date_split[6] + '/' + date_split[7]
-    });
-    $('#datetimepicker').on('dp.change', function (e) {
-        var str = document.baseURI;
-        window.location = str.replace(/(.*)\/\d+\/\d+\/\d+\/$/g, '$1/' + e.date.format('YYYY') + '/' + e.date.format('M') + '/' + e.date.format('D') + '/');
     });
 });

@@ -37,6 +37,13 @@ class PhoneValidationMixin(models.Model):
         self.phone = '+7{}'.format(self.phone[-10:])
 
 
+class AppointmentsManager(models.Manager):
+    def get_appointments_for(self, barber, start, end):
+        client_schedule_data = [Event.objects.get(pk=EventRelation.objects.filter(event__calendar__name='client_schedule').get(object_id=appointment.id).event_id) for appointment in Appointment.objects.filter(barber=barber)]
+        occurrences = Period(client_schedule_data, start + timedelta(minutes=1), end - timedelta(minutes=1)).get_occurrences()
+        return [Event.objects.get(pk=occ.event_id) for occ in occurrences]
+
+
 class BarberManager(models.Manager):
     def get_active_barbers(self, day):
         active_barbers = []
@@ -102,3 +109,5 @@ class Appointment(models.Model):
     orders = models.ManyToManyField(OrderDetail)
     comment = models.TextField(verbose_name='Дополнительно', blank=True)
 
+
+    objects = AppointmentsManager()

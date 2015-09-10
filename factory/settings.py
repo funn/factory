@@ -35,6 +35,7 @@ INSTALLED_APPS = (
     'schedule',
     'crispy_forms',
     'clever_selects',
+    'datetimewidget',
     'django.contrib.admin.apps.SimpleAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -110,6 +111,8 @@ STATIC_URL = '/static/'
 # crispy-forms
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+CRISPY_FAIL_SILENTLY = not DEBUG
 
 
 # Custom settings
