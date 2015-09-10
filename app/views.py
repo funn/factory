@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.forms.formsets import formset_factory
 from django.shortcuts import redirect, render, get_object_or_404
 from django.core.urlresolvers import reverse
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponse
 from django.utils.timezone import make_aware, utc
 from django.conf import settings
 
@@ -234,6 +234,12 @@ def edit_appointment(request, appointment):
         form_app = CreateAppointmentForm(date=date_start, initial=initial_data_form, barber=appointment.barber)
 
     return render(request, 'admin/edit_appointment.html', {'appointment': appointment, 'formset': formset, 'barber': appointment.barber, 'form': form_app, 'time':'{}-00'.format(date_start.hour)})
+
+
+def delete_appointment(request, appointment):
+    appointment = get_object_or_404(Appointment, pk=appointment)
+    appointment.delete()
+    return HttpResponse('')
 
 
 class AjaxChainedProducts(ChainedSelectChoicesView):

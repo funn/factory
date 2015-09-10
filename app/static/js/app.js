@@ -6,7 +6,7 @@ require('bootstrap');
 
 $(function () {
     var date_split = this.baseURI.split('/');
-    $('#main_table a').click(function (event) { // Maybe not so general?
+    $('#main_table a.app_ajax').click(function (event) { // Maybe not so general?
         event.preventDefault();
         var hour = this.parentNode.parentNode.children[0].textContent;
         var hour_split = hour.split('-');
@@ -32,6 +32,21 @@ $(function () {
                 modal.modal('show');
             }
         });
+        return false;
+    });
+    $('#main_table a.app_confirm').click(function (event) {
+        event.preventDefault();
+        if (confirm('Удалить запись?')) {
+            $.ajax({
+                url: this.getAttribute('href', 2),
+                success: function () {
+                    window.location.reload();
+                },
+                error: function () {
+                    alert('Не удалось.');
+                }
+            });
+        }
         return false;
     });
 });
