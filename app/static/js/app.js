@@ -3,6 +3,7 @@ global.$ = global.jQuery;
 require('jquery-form');
 require('./jquery.formset.js');
 require('bootstrap');
+require('./bootstrap-datetimepicker.js');
 
 $(function () {
     var date_split = this.baseURI.split('/');
@@ -48,5 +49,23 @@ $(function () {
             });
         }
         return false;
+    });
+    $('#datetimepicker').datetimepicker({
+        'format': 'dd/mm/yyyy',
+        'minView': 2,
+        'startView': 2,
+        'todayBtn': true,
+        'todayHighlight': true,
+        'onSelect': function (d, i) {
+            if (d !== i.lastVal) {
+              $(this).change();
+            }
+        }
+    });
+    $('#datetimepicker').datetimepicker('setDate', new Date(date_split[5], date_split[6] - 1, date_split[7]));
+    $('#datetimepicker').change(function () {
+        var str = document.baseURI;
+        var date = $('#datetimepicker').datetimepicker('getDate');
+        window.location = str.replace(/(.*)\/\d+\/\d+\/\d+\/$/g, '$1/' + date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate() + '/');
     });
 });

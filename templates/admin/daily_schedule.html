@@ -6,15 +6,16 @@
     <meta charset="UTF-8">
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
     <link href="{% static 'css/daily_schedule.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'css/datetimepicker.css' %}" rel="stylesheet" media="screen">
     <script src="{% static 'js/build.js' %}"></script>
     {% include 'autocomplete_light/static.html' %}
 </head>
 <body>
     <div class="container-fluid top-bar">
         <div class='input-group date' id='datetimepicker'>
-            <input id="datetime-text" type='text' class="form-control" />
+            <input class="datetimewidget form-control" type="text" name="date" />
             <span class="input-group-addon">
-                <span class="glyphicon glyphicon-calendar"></span>
+                <span class="glyphicon glyphicon-th"></span>
             </span>
         </div>
     </div>
